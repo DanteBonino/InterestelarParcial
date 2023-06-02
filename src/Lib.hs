@@ -11,7 +11,7 @@ coordY (_,y,_) = y
 coordZ (_,_,z) = z
 
 -- De los astronautas sabemos el nombre, la edad terrestre y el planeta en el que están
-data Astronauta = UnAstronauta String Int Planeta
+data Astronauta = Astronauta String Int Planeta
 
 nombre (Astronauta n _ _) = n
 edad (Astronauta _ e _) = e
@@ -84,8 +84,9 @@ astronautasQuePuedenSerRescatados :: Tripulacion -> Nave -> [Astronauta] -> [Str
 astronautasQuePuedenSerRescatados unaTripulacion unaNave = (map nombre . filter (puedeSerRescatado unaTripulacion unaNave))
 
 puedeSerRescatado :: Tripulacion -> Nave -> Astronauta -> Bool
-puedeSerRescatad unaTripulacion unaNave unAstronauta = (all ((>90) . edad) . rescatarAstronauta unaNave unaTripulacion (planeta unAstronauta)) unAstronauta
+puedeSerRescatado unaTripulacion unaNave unAstronauta = (all ((>90) . edad) . rescatarAstronauta unaNave unaTripulacion (planeta unAstronauta)) unAstronauta
 
 --Punto 5:
 f ::(Ord b)=> (b -> e -> b) -> b -> (Int -> e -> Bool)-> [e]-> Bool
 f a b c = any ((> b).a b).filter (c 10) 
+
