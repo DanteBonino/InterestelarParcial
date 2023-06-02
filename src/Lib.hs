@@ -65,9 +65,10 @@ cambiarPlaneta :: Planeta -> Astronauta -> Astronauta
 cambiarPlaneta unPlaneta (Astronauta unNombre unaEdad _) = Astronauta unNombre unaEdad unPlaneta
 
 --Punto 4:
+--a)
 type Tripulacion = [Astronauta]
-rescatarAstronauta :: Nave -> Astronauta -> Planeta -> Tripulacion -> Tripulacion
-rescatarAstronauta unaNave unAstronauta destino unaTripulacion = ((viajeTripulacion destino (planetaDeOrigen unaTripulacion)  unaNave) . (incorporarTripulante (pasarTiempo  ((round . unaNave (planetaDeOrigen unaTripulacion)) destino)  unAstronauta)) . viajeTripulacion (planetaDeOrigen unaTripulacion) destino unaNave) unaTripulacion
+rescatarAstronauta :: Nave -> Tripulacion -> Planeta -> Astronauta -> Tripulacion
+rescatarAstronauta unaNave unaTripulacion destino unAstronauta = ((viajeTripulacion destino (planetaDeOrigen unaTripulacion)  unaNave) . (incorporarTripulante (pasarTiempo  ((round . unaNave (planetaDeOrigen unaTripulacion)) destino)  unAstronauta)) . viajeTripulacion (planetaDeOrigen unaTripulacion) destino unaNave) unaTripulacion
 
 planetaDeOrigen :: Tripulacion -> Planeta
 planetaDeOrigen = (planeta . head)
@@ -77,6 +78,13 @@ incorporarTripulante unAstronauta = (unAstronauta :)
 
 viajeTripulacion :: Planeta -> Planeta -> Nave -> Tripulacion -> Tripulacion
 viajeTripulacion unPlaneta otroPlaneta unaNave = map (viajar unPlaneta otroPlaneta unaNave)
+
+--b)
+astronautasQuePuedenSerRescatados :: Tripulacion -> Nave -> [Astronauta] -> [String]
+astronautasQuePuedenSerRescatados unaTripulacion unaNave = (map nombre . filter (puedeSerRescatado unaTripulacion unaNave))
+
+puedeSerRescatado :: Tripulacion -> Nave -> Astronauta -> Bool
+puedeSerRescatad unaTripulacion unaNave unAstronauta = (all ((>90) . edad) . rescatarAstronauta unaNave unaTripulacion (planeta unAstronauta)) unAstronauta
 
 --Punto 5:
 f ::(Ord b)=> (b -> e -> b) -> b -> (Int -> e -> Bool)-> [e]-> Bool
