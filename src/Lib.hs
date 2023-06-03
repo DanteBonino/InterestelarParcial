@@ -31,6 +31,14 @@ aplicarRestaAlCuadradoACoordenadas coordenadas unPlaneta  = (restaAlCuadrado (co
 restaAlCuadrado :: Float -> Float -> Float
 restaAlCuadrado unValor  = ((^2) . subtract unValor)
 
+--Otra forma:
+distanciaEntrePuntos :: Planeta -> Planeta -> Float
+distanciaEntrePuntos (Planeta _ (x1, y1, z1)_) (Planeta _ (x2, y2, z2) _) =
+  sqrt $ componentePitagoras x1 x2 + componentePitagoras y1 y2 + componentePitagoras z1 z2
+
+componentePitagoras :: Float -> Float -> Float
+componentePitagoras = restaAlCuadrado
+
 --b)
 tiempoDeViaje :: Float -> Planeta -> Planeta -> Float
 tiempoDeViaje unaVelocidad unPlaneta = ((/ unaVelocidad) . distanciaEntre unPlaneta)
@@ -55,8 +63,9 @@ velocidadSegunTanques unaCantidad
 --b)
 naveFuturista ::  Planeta -> Planeta -> Float
 naveFuturista _ _ = 0
-viajar ::  Planeta -> Planeta -> Nave -> Astronauta -> Astronauta
-viajar origen destino unaNave  = (cambiarPlaneta destino . (aumentarEdad . round) (unaNave origen destino))
+
+viajar ::  Planeta -> Nave -> Astronauta -> Astronauta
+viajar  destino unaNave unAstronauta  = (cambiarPlaneta destino . (aumentarEdad . round) (unaNave (planeta unAstronauta) destino)) unAstronauta
 
 aumentarEdad :: Int -> Astronauta -> Astronauta
 aumentarEdad unaCantidad = cambiarEdad ((+unaCantidad))
@@ -67,8 +76,8 @@ cambiarPlaneta unPlaneta (Astronauta unNombre unaEdad _) = Astronauta unNombre u
 --Punto 4:
 --a)
 type Tripulacion = [Astronauta]
-rescatarAstronauta :: Nave -> Tripulacion -> Planeta -> Astronauta -> Tripulacion
-rescatarAstronauta unaNave unaTripulacion destino unAstronauta = ((viajeTripulacion destino (planetaDeOrigen unaTripulacion)  unaNave) . (incorporarTripulante (pasarTiempo  ((round . unaNave (planetaDeOrigen unaTripulacion)) destino)  unAstronauta)) . viajeTripulacion (planetaDeOrigen unaTripulacion) destino unaNave) unaTripulacion
+rescatarAstronauta :: Nave -> Tripulacion -> Astronauta -> Tripulacion
+rescatarAstronauta unaNave unaTripulacion  unAstronauta = ((viajeTripulacion (planeta unAstronauta)  unaNave) . (incorporarTripulante (pasarTiempo  ((round . unaNave (planetaDeOrigen unaTripulacion)) (planeta unAstronauta))  unAstronauta)) . viajeTripulacion (planeta unAstronauta) unaNave) unaTripulacion
 
 planetaDeOrigen :: Tripulacion -> Planeta
 planetaDeOrigen = (planeta . head)
@@ -76,17 +85,20 @@ planetaDeOrigen = (planeta . head)
 incorporarTripulante :: Astronauta ->Tripulacion -> Tripulacion
 incorporarTripulante unAstronauta = (unAstronauta :)
 
-viajeTripulacion :: Planeta -> Planeta -> Nave -> Tripulacion -> Tripulacion
-viajeTripulacion unPlaneta otroPlaneta unaNave = map (viajar unPlaneta otroPlaneta unaNave)
+viajeTripulacion :: Planeta -> Nave -> Tripulacion -> Tripulacion
+viajeTripulacion  destino unaNave = map (viajar destino unaNave)
 
 --b)
 astronautasQuePuedenSerRescatados :: Tripulacion -> Nave -> [Astronauta] -> [String]
 astronautasQuePuedenSerRescatados unaTripulacion unaNave = (map nombre . filter (puedeSerRescatado unaTripulacion unaNave))
 
 puedeSerRescatado :: Tripulacion -> Nave -> Astronauta -> Bool
-puedeSerRescatado unaTripulacion unaNave unAstronauta = (all ((>90) . edad) . rescatarAstronauta unaNave unaTripulacion (planeta unAstronauta)) unAstronauta
+puedeSerRescatado unaTripulacion unaNave = (all estaViejo . rescatarAstronauta unaNave unaTripulacion) 
+
+estaViejo :: Astronauta -> Bool
+estaViejo = ((>90) . edad)
 
 --Punto 5:
-f ::(Ord b)=> (b -> e -> b) -> b -> (Int -> e -> Bool)-> [e]-> Bool
+f ::(Ord b, Num t)=> (b -> e -> b) -> b -> (t -> e -> Bool)-> [e]-> Bool
 f a b c = any ((> b).a b).filter (c 10) 
 
